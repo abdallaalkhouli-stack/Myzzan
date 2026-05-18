@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Header } from '../../../components/Header';
+import { WaitlistModal } from '../../../components/WaitlistModal';
 
 export default function CoinDetail() {
   const params = useParams();
   const ticker = params.ticker as string;
   const [coin, setCoin] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchCoin() {
@@ -42,27 +44,8 @@ export default function CoinDetail() {
     return true;
   };
 
-  const handleDownloadPDF = async () => {
-    try {
-      const html2canvas = (await import('html2canvas')).default;
-      const { jsPDF } = await import('jspdf');
-      
-      const element = document.getElementById('pdf-content');
-      if (!element) return;
-      
-      const canvas = await html2canvas(element, { scale: 2 });
-      const imgData = canvas.toDataURL('image/png');
-      
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Myzzan_${coin.name}_Report.pdf`);
-    } catch (err) {
-      console.error(err);
-      alert('Error generating PDF report.');
-    }
+  const handleDownloadPDF = () => {
+    setModalOpen(true);
   };
 
   if (loading) return <div className="container" style={{ paddingTop: '4rem', textAlign: 'center', fontFamily: 'var(--font-body)', color: '#1a1a2e' }}>Loading analysis...</div>;
@@ -227,6 +210,11 @@ export default function CoinDetail() {
         </div>
 
       </div>
+      <WaitlistModal 
+        isOpen={modalOpen} 
+        onClose={() => setModalOpen(false)} 
+        featureName="Sharia Audit PDF Export" 
+      />
     </div>
   );
 }

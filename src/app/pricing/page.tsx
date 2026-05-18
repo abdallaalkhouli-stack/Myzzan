@@ -1,19 +1,101 @@
 "use client";
-import Link from 'next/link';
+
+import React, { useState } from 'react';
 import { Header } from '../components/Header';
 import { Footer } from '../components/Footer';
+
+interface TierFormProps {
+  tierName: string;
+}
+
+function TierWaitlistForm({ tierName }: TierFormProps) {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source: `pricing_${tierName.toLowerCase()}` }),
+      });
+      const data = await res.json();
+      setMessage(data.message);
+      if (res.ok && data.success) {
+        setSuccess(true);
+      }
+    } catch {
+      setMessage("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return (
+      <div style={{ color: "#2a7a4a", fontSize: "11px", fontWeight: "500", background: "#eaf6ee", padding: "8px 12px", borderRadius: "6px", textAlign: "center" }}>
+        {message}
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+      <input 
+        type="email" 
+        placeholder="Enter your email" 
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        required
+        style={{
+          width: "100%", padding: "10px 12px", borderRadius: "6px",
+          border: "0.5px solid #e0e0e8", fontFamily: "var(--font-body)",
+          fontSize: "12px", outline: "none", background: "#ffffff"
+        }}
+      />
+      {message && (
+        <div style={{ color: "#c0392b", fontSize: "10px", fontWeight: "500", textAlign: "left" }}>
+          {message}
+        </div>
+      )}
+      <button 
+        type="submit" 
+        disabled={loading}
+        className="btn btn-primary" 
+        style={{ width: "100%", padding: "10px", borderRadius: "6px", fontSize: "11px", fontWeight: "500" }}
+      >
+        {loading ? "Joining..." : "Join Waitlist"}
+      </button>
+    </form>
+  );
+}
 
 export default function Pricing() {
   return (
     <div style={{ background: '#f4f4f4', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header />
+      
       <main className="container" style={{ paddingTop: '5rem', paddingBottom: '6rem', maxWidth: '1100px', textAlign: 'center', flex: 1 }}>
-        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '40px', color: '#1a1a2e', margin: '0 0 10px 0' }}>Enterprise Plans</h1>
-        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '14px', color: '#9a9aaa', margin: '0 0 4rem 0' }}>Select the Sharia-compliance access tier right for your platform or portfolio.</p>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '40px', color: '#1a1a2e', margin: '0 0 10px 0' }}>
+          Enterprise Beta Access
+        </h1>
+        <p style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '14px', color: '#9a9aaa', margin: '0 0 4rem 0' }}>
+          Myzzan is currently in closed beta. Select your desired tier and join the waitlist for priority access.
+        </p>
 
         {/* Crypto Payment Info */}
         <div className="card" style={{ display: 'inline-flex', alignItems: 'center', gap: '16px', padding: '12px 24px', borderRadius: '50px', marginBottom: '3rem', border: '1px solid #4a6fa5' }}>
-          <span style={{ fontSize: '12px', fontWeight: '500', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pay with crypto — instant access</span>
+          <span style={{ fontSize: '12px', fontWeight: '500', color: '#1a1a2e', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Future settlements powered exclusively by crypto
+          </span>
           <div style={{ display: 'flex', gap: '8px' }}>
             {["USDT", "BTC", "ETH", "USDC"].map(c => (
               <span key={c} style={{ background: '#e8eef6', color: '#4a6fa5', padding: '2px 8px', borderRadius: '4px', fontSize: '10px', fontWeight: '600' }}>{c}</span>
@@ -39,7 +121,7 @@ export default function Pricing() {
                 ))}
               </div>
             </div>
-            <Link href="/signup" style={{ display: 'block', width: '100%', textAlign: 'center', background: '#f4f4f4', border: '1px solid #e0e0e8', color: '#1a1a2e', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '12px', padding: '12px', borderRadius: '8px', textDecoration: 'none' }}>Get Started</Link>
+            <TierWaitlistForm tierName="Free" />
           </div>
 
           {/* INVESTOR PLAN */}
@@ -59,7 +141,7 @@ export default function Pricing() {
                 ))}
               </div>
             </div>
-            <button style={{ width: '100%', background: '#4a6fa5', color: '#ffffff', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '12px', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Subscribe Investor</button>
+            <TierWaitlistForm tierName="Investor" />
           </div>
 
           {/* BUILDER PLAN */}
@@ -78,7 +160,7 @@ export default function Pricing() {
                 ))}
               </div>
             </div>
-            <button style={{ width: '100%', background: '#1a1a2e', color: '#ffffff', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '12px', padding: '12px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Subscribe Builder</button>
+            <TierWaitlistForm tierName="Builder" />
           </div>
 
           {/* PLATFORM PLAN */}
@@ -97,11 +179,12 @@ export default function Pricing() {
                 ))}
               </div>
             </div>
-            <button style={{ width: '100%', background: '#ffffff', border: '1px solid #e0e0e8', color: '#1a1a2e', fontFamily: 'var(--font-body)', fontWeight: 500, fontSize: '12px', padding: '12px', borderRadius: '8px', cursor: 'pointer' }}>Subscribe Platform</button>
+            <TierWaitlistForm tierName="Platform" />
           </div>
 
         </div>
       </main>
+      
       <Footer />
     </div>
   );

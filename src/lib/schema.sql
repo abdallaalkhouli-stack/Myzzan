@@ -39,3 +39,12 @@ CREATE TABLE audit_log (
   timestamp TIMESTAMPTZ DEFAULT NOW(),
   ip_hash TEXT
 );
+
+-- 5. Waitlist Table
+CREATE TABLE waitlist (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  source TEXT DEFAULT 'landing_page'
+);
+
