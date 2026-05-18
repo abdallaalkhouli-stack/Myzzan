@@ -157,3 +157,12 @@ a {
   color: #7a1a1a;
   border: 1px solid #d8a0a0;
 }
+
+[dir="rtl"] {
+  font-family: 'Noto Naskh Arabic', var(--font-body);
+}
+
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  font-family: 'Noto Naskh Arabic', var(--font-display);
+}
+

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /coin/*
+Allow: /blog/*
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /api
+
+Sitemap: https://myzzan.com/sitemap.xml

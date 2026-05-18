@@ -2,20 +2,24 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
-  const handleSearch = () => {
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!search) return;
-    alert("Basic Verdict: ⚠ Doubtful\n\n(Mocked response for " + search + ")");
+    router.push(`/analyze?ticker=${search.toUpperCase()}`);
   };
 
   return (
-    <>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
-      <main>
-        <section style={{ padding: "6rem 0", textAlign: "center", background: "#f4f4f4", minHeight: "calc(100vh - 70px)" }}>
+      <main style={{ flex: 1 }}>
+        <section style={{ padding: "6rem 0", textAlign: "center", background: "#f4f4f4" }}>
           <div className="container">
             <div style={{ display: "inline-block", background: "#e8eef6", color: "#4a6fa5", padding: "6px 14px", borderRadius: "20px", fontSize: "11px", fontWeight: "500", marginBottom: "2.5rem", fontFamily: "var(--font-body)" }}>
               <span style={{ marginRight: "6px" }}>●</span> 50 coins screened live
@@ -31,7 +35,7 @@ export default function Home() {
             </p>
             
             <div style={{ maxWidth: '550px', margin: '0 auto', background: 'transparent' }}>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
                 <input 
                   type="text" 
                   value={search}
@@ -40,13 +44,13 @@ export default function Home() {
                   style={{ flex: 1, padding: '11px 16px', borderRadius: '9px', border: '0.5px solid #e0e0e8', background: '#ffffff', color: '#1a1a2e', fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '11px', outline: 'none' }}
                 />
                 <button 
-                  onClick={handleSearch} 
+                  type="submit"
                   className="btn btn-primary"
                   style={{ padding: '11px 18px', fontSize: '11px' }}
                 >
                   Check
                 </button>
-              </div>
+              </form>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontFamily: 'var(--font-body)', fontSize: '12px', color: '#9a9aaa', marginBottom: '0.5rem' }}>
                   See full Sharia analysis, scoring breakdown, and PDF report &rarr;
@@ -57,6 +61,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-    </>
+      <Footer />
+    </div>
   );
 }
